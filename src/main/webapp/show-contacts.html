@@ -1,0 +1,202 @@
+<html lang="en" ng-app="MyApp">
+<head>
+    <style>
+        .inline {
+            display: inline;
+        }
+
+        .none {
+            display: none;
+        }
+
+        .right {
+            float: right;
+            margin-right: 10px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            margin-top: 25px;
+        }
+    </style>
+    <!--<link rel="shortcut icon" href="icon.png" />-->
+    <link rel="stylesheet" href="/resources/css/dialogs.css">
+    <link rel="stylesheet" href="/resources/css/bootstrap.css">
+    <link rel="stylesheet" href="/resources/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/resources/css/bootstrap.min.css">
+
+    <script src="/resources/js/angular.min.js"></script>
+    <script src="/resources/js/jquery.min.js"></script>
+    <script src="/resources/js/angular.min.js"></script>
+    <script src="/resources/js/angular-route.min.js"></script>
+    <script src="/resources/js/angular-sanitize.min.js"></script>
+    <script src="/resources/js/angular-translate.min.js"></script>
+    <script src="/resources/js/ui-bootstrap-tpls.min.js"></script>
+    <script src="/resources/js/dialogs.min.js"></script>
+
+    <meta charset="UTF-8">
+    <title>Contacts</title>
+
+</head>
+<body>
+
+<div ng-app="myApp" ng-controller="myCtrl">
+    <div class="container">
+        <div class="col-md-8 col-md-offset-2">
+
+            <form ng-submit="add()">
+
+                <input type="submit" class="btn btn-default right" value="Add Contact"/>
+                <div class="form-group">
+                    <br>
+                    <input type="text" class="form-control" id="name" ng-model="contactForm.name"
+                           placeholder="First Name"/>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" class="form-control" id="address" ng-model="contactForm.family"
+                           placeholder="Last Name"/>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" class="form-control" id="homePhone" ng-model="contactForm.tel"
+                           placeholder="Home Phone"/>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" class="form-control" id="cellPhone" ng-model="contactForm.mobile"
+                           placeholder="Cell Phone"/>
+                </div>
+
+                <div class="form-group">
+                    <input type="email" class="form-control" id="email" ng-model="contactForm.email"
+                           placeholder="Email"/>
+                </div>
+
+                <br>
+
+            </form>
+
+
+            <div class="table-responsive">
+
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Address</th>
+                        <th>Home Phone</th>
+                        <th>Cell Phone</th>
+                        <th>Email</th>
+                        <th>Details</th>
+                        <th>Remove</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="item in contactList">
+                        <td>{{$index + 1}}</td>
+                        <td ng-bind="item.name"></td>
+                        <td ng-bind="item.family"></td>
+                        <td ng-bind="item.tel"></td>
+                        <td ng-bind="item.mobile"></td>
+                        <td ng-bind="item.email"></td>
+                        <td>
+                            <button class="btn btn-link" ng-click="edit(item)"><span
+                                    class="glyphicon glyphicon-blackboard"></span></button>
+                        </td>
+                        <td>
+                            <button class="btn btn-link" ng-click="delete(item)"><span
+                                    class="glyphicon glyphicon-remove"></span></button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var myapp = angular.module('MyApp', []);
+    myapp.controller('myCtrl', function ($scope, $http) {
+
+        $scope.contactForm = {
+            // id : -1,
+            firstName : "",
+            lastName : "",
+            homePhone: "",
+            cellPhone:"",
+            email:""
+        };
+
+
+
+        _refreshCountryData();
+
+        function _refreshCountryData() {
+            $http.get("/app/phonebook/list")
+                .success(function (response) {
+                    $scope.contactList = response;
+                })
+        }
+
+        $scope.add = function () {
+            $http({
+                method: "POST",
+                url: "/app/phonebook/add",
+                data: angular.toJson($scope.contactForm),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(_success, _error);
+        };
+
+
+        $scope.delete = function (deleteItem) {
+            $http({
+                method: "POST",
+                url: "/app/phonebook/delete/" + deleteItem.id,
+            }).then(_success, _error);
+        };
+
+
+        function _success(response) {
+            _refreshCountryData();
+            _clearFormData();
+
+        }
+
+        function _error(response) {
+            console.log(response.statusText);
+        }
+
+        function _clearFormData() {
+            // $scope.contactForm.id = -1;
+            $scope.contactForm.firstName = "";
+            $scope.contactForm.lastName = "";
+            $scope.contactForm.homePhone = "";
+            $scope.contactForm.cellPhone = "";
+            $scope.contactForm.email = "";
+        };
+    })
+
+    // var myapp = angular.module('MyApp2', []);
+    // myapp.controller('myCtrl2', function ($scope, $http) {
+    //
+    //     $scope.add() = function(
+    //         $http.get("/app/phone-book/list")
+    //         .success(function (response) {
+    //             $scope.contactList = response;
+    //         })
+    //     )
+    //
+    // })
+
+</script>
+
+
+<!--<script src="contacts.js"></script>-->
+</body>
+</html>l>
